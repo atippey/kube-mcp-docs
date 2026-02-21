@@ -1,0 +1,3 @@
+[submodule "ext/kube-mcp"]
+	path = ext/kube-mcp
+	url = git@github.com:atippey/kube-mcp.git
