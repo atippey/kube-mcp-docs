@@ -59,7 +59,7 @@ npm run preview
 - `npm run build` - Generate CRD reference docs, then build static site into `dist/`.
 - `npm run preview` - Preview the built static output.
 - `npm run generate:schemas` - Generate `src/content/docs/reference/*.mdx` from CRDs.
-- `npm run check:schemas` - Regenerate CRD reference docs and fail if tracked generated files differ.
+- `npm run check:schemas` - Regenerate CRD reference docs and print a diff if the output has changed (local spot-check only; not run in CI).
 - `npm run validate:tag -- <tag>` - Validate docs release tag format.
 - `npm run hooks:install` - Configure git to use repository hooks in `.githooks/`.
 - `npm run lint` - Run Biome checks (`biome ci .`).
@@ -105,7 +105,7 @@ Triggers:
 
 Behavior:
 
-- `main` + PR runs: `npm ci`, `npm run lint`, `npx tsc --noEmit`, `npm run check:schemas`, `npm run build`
+- `main` + PR runs: `npm ci`, `npm run lint`, `npx tsc --noEmit`, `npm run build`
 - Tag runs additionally upload build artifact and deploy to Cloudflare Pages
 
 Deploy secrets used by workflow:

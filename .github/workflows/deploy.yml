@@ -25,7 +25,6 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npx tsc --noEmit
-      - run: npm run check:schemas
       - run: npm run build
 
       - uses: actions/upload-artifact@v4

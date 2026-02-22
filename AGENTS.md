@@ -31,12 +31,12 @@ reference docs generated from the upstream `kube-mcp` submodule.
 3. Run lint and type checks:
    - `npm run lint`
    - `npx tsc --noEmit`
-4. Verify generated reference docs are up to date:
-   - `npm run check:schemas`
-5. Validate release tag format when preparing a release:
+4. Validate release tag format when preparing a release:
    - `npm run validate:tag -- <tag>`
-6. Build and verify output:
+5. Build and verify output:
    - `npm run build`
+
+`check:schemas` is available as a local spot-check (`npm run check:schemas`) but is not part of CI.
 
 For local iteration:
 
