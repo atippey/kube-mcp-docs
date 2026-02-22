@@ -1,0 +1,18 @@
+:root {
+  --sl-color-accent-low: #062839;
+  --sl-color-accent: #1fa6d9;
+  --sl-color-accent-high: #bdefff;
+  --sl-color-bg-nav: #06131d;
+}
+
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #0b3042;
+  --sl-color-accent: #2db7ea;
+  --sl-color-accent-high: #d9f6ff;
+}
+
+.hero-logo {
+  max-width: 20rem;
+  width: 100%;
+  height: auto;
+}

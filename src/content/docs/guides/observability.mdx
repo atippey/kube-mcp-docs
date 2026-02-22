@@ -1,0 +1,31 @@
+---
+title: Observability
+description: Monitor MCP workloads with metrics, logs, and health checks.
+---
+
+## Metrics
+
+Expose Prometheus-compatible metrics for operator and server workloads.
+
+```bash
+kubectl port-forward -n mcp-system deploy/mcp-operator 9090:9090
+curl http://localhost:9090/metrics
+```
+
+## Logging
+
+Use structured JSON logs and centralize with your platform logging stack.
+
+```bash
+kubectl logs -n mcp-system deploy/mcp-operator -f
+```
+
+## Health endpoints
+
+Ensure readiness and liveness probes are enabled in your deployment specs.
+
+Use resource status and conditions for quick diagnostics:
+
+```bash
+kubectl describe mcpserver main -n mcp-system
+```

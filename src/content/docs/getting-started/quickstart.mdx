@@ -1,0 +1,70 @@
+---
+title: Quickstart
+description: Deploy your first MCPServer and MCPTool in minutes.
+---
+
+## 1. Deploy an MCPServer
+
+```yaml
+apiVersion: kubemcp.io/v1alpha1
+kind: MCPServer
+metadata:
+  name: main
+  namespace: mcp-system
+spec:
+  replicas: 1
+  redis:
+    serviceName: mcp-redis
+  toolSelector:
+    matchLabels:
+      mcp-server: main
+```
+
+Apply it:
+
+```bash
+kubectl apply -f mcpserver.yaml
+```
+
+## 2. Deploy one MCPTool
+
+```yaml
+apiVersion: kubemcp.io/v1alpha1
+kind: MCPTool
+metadata:
+  name: weather
+  namespace: mcp-system
+  labels:
+    mcp-server: main
+spec:
+  name: weather
+  description: Return weather for a location
+  service:
+    name: weather-tool-svc
+    port: 8080
+    path: /weather
+  method: POST
+  ingressPath: /tools/weather
+  inputSchema:
+    type: object
+    required: [city]
+    properties:
+      city:
+        type: string
+```
+
+Apply it:
+
+```bash
+kubectl apply -f mcptool.yaml
+```
+
+## 3. Validate
+
+```bash
+kubectl get mcpserver -n mcp-system
+kubectl get mcptool -n mcp-system
+kubectl describe mcpserver main -n mcp-system
+```
+
+See full fields in [MCPServer reference](/reference/mcpserver/) and [MCPTool reference](/reference/mcptool/).

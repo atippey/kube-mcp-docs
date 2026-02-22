@@ -1,0 +1,40 @@
+---
+title: Installation
+description: Install CRDs and deploy the operator with Kustomize.
+---
+
+## Prerequisites
+
+- Kubernetes cluster (v1.27+ recommended)
+- `kubectl`
+- Access to deploy into your target namespace
+
+## Install CRDs
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcpserver-crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcptool-crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcpprompt-crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcpresource-crd.yaml
+```
+
+These URLs are pinned to a specific upstream commit for reproducible installs.
+When a formal release tag is available, prefer tag-based URLs.
+
+## Deploy Operator (Kustomize)
+
+```bash
+git clone https://github.com/atippey/kube-mcp.git
+cd kube-mcp
+kubectl apply -k manifests/base
+```
+
+## Verify
+
+```bash
+kubectl get crd | grep mcp
+kubectl get deploy -n mcp-system
+kubectl get pods -n mcp-system
+```
+
+Next: [Quickstart](/getting-started/quickstart/)

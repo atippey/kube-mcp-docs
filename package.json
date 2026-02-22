@@ -1,0 +1,21 @@
+{
+  "name": "kubemcp-docs",
+  "version": "0.1.0",
+  "private": true,
+  "license": "CC-BY-4.0",
+  "description": "Documentation site for the kubemcp.io Kubernetes operator",
+  "type": "module",
+  "scripts": {
+    "dev": "npm run generate:schemas && astro dev",
+    "build": "npm run generate:schemas && astro build",
+    "preview": "astro preview",
+    "generate:schemas": "tsx scripts/generate-schema-docs.ts"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.37.6",
+    "astro": "^5.17.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "yaml": "^2.8.2"
+  }
+}

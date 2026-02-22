@@ -1,0 +1,47 @@
+---
+title: Prompts and Resources
+description: Add reusable prompt templates and API resources.
+---
+
+## MCPPrompt
+
+`MCPPrompt` defines templated text plus typed variables.
+
+```yaml
+apiVersion: kubemcp.io/v1alpha1
+kind: MCPPrompt
+metadata:
+  name: triage-helper
+  namespace: mcp-system
+  labels:
+    mcp-server: main
+spec:
+  name: triage-helper
+  template: |
+    Summarize incident {{incident_id}} and propose next steps.
+  variables:
+    - name: incident_id
+      required: true
+```
+
+## MCPResource
+
+`MCPResource` can map operations to services or provide inline content.
+
+```yaml
+apiVersion: kubemcp.io/v1alpha1
+kind: MCPResource
+metadata:
+  name: runbook
+  namespace: mcp-system
+  labels:
+    mcp-server: main
+spec:
+  name: runbook
+  content:
+    uri: "runbook://platform/oncall"
+    mimeType: "text/markdown"
+    text: "# On-call runbook"
+```
+
+See detailed fields in [MCPPrompt reference](/reference/mcpprompt/) and [MCPResource reference](/reference/mcpresource/).

@@ -1,0 +1,39 @@
+---
+title: kubemcp.io
+description: Kubernetes-native MCP server operator
+---
+
+import logo from '../../assets/logo.png';
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+  <img src={logo.src} alt="kubemcp.io logo" class="hero-logo" />
+</div>
+
+# Ingress for agents
+
+`kubemcp.io` helps you run Model Context Protocol servers as first-class Kubernetes resources.
+
+[Get Started](/getting-started/installation/)
+
+<CardGrid>
+  <Card title="K8s Native" icon="seti:kubernetes">
+    Define MCP behavior with CRDs and reconcile state declaratively.
+  </Card>
+  <Card title="Label-based Composition" icon="material-symbols:label-outline">
+    Select tools, prompts, and resources by labels per `MCPServer`.
+  </Card>
+  <Card title="HA Redis" icon="material-symbols:database-outline">
+    Back MCP server sessions and cache with production-safe Redis topology.
+  </Card>
+  <Card title="Built-in Observability" icon="material-symbols:monitoring-outline">
+    Export metrics, structured logs, and health endpoints for platform teams.
+  </Card>
+</CardGrid>
+
+## What you can do quickly
+
+- Deploy an `MCPServer` and expose it through cluster ingress.
+- Register multiple `MCPTool` resources behind one server.
+- Publish reusable `MCPPrompt` templates and `MCPResource` endpoints.
+- Use Kubernetes RBAC, NetworkPolicy, and metrics from day one.

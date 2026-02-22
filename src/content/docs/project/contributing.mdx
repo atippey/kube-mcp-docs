@@ -1,0 +1,25 @@
+---
+title: Contributing
+description: Development setup, testing, and pull requests.
+---
+
+## Local development
+
+```bash
+npm ci
+npm run generate:schemas
+npm run dev
+```
+
+## Build checks
+
+```bash
+npm run build
+```
+
+## Pull request process
+
+- Keep changes scoped and document behavior changes.
+- Regenerate schema docs when CRDs change.
+- Ensure build succeeds before opening PR.
+- Link related upstream issues where applicable.

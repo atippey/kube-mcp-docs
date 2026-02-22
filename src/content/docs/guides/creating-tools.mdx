@@ -1,0 +1,47 @@
+---
+title: Creating Tools
+description: Build a backing service and register it with MCPTool.
+---
+
+## Backing service contract
+
+Your tool backend should expose an HTTP endpoint that accepts and returns JSON.
+
+## Example service declaration
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-tool-svc
+  namespace: mcp-system
+spec:
+  selector:
+    app: my-tool
+  ports:
+    - port: 8080
+      targetPort: 8080
+```
+
+## Register MCPTool
+
+```yaml
+apiVersion: kubemcp.io/v1alpha1
+kind: MCPTool
+metadata:
+  name: my-tool
+  namespace: mcp-system
+  labels:
+    mcp-server: main
+spec:
+  name: my-tool
+  description: Internal business tool
+  service:
+    name: my-tool-svc
+    port: 8080
+    path: /invoke
+  method: POST
+  ingressPath: /tools/my-tool
+```
+
+Use the full schema in [MCPTool reference](/reference/mcptool/).

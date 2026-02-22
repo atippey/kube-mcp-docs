@@ -1,0 +1,30 @@
+---
+title: Concepts
+description: Core architecture and reconciliation model.
+---
+
+## Core resources
+
+- `MCPServer`: top-level server deployment and selection boundary.
+- `MCPTool`: executable tool definitions mapped to backing services.
+- `MCPPrompt`: reusable template prompts with variables.
+- `MCPResource`: API-style resources, operation mappings, or inline content.
+
+## Label selectors
+
+`MCPServer.spec.toolSelector` controls which resources are attached to a server.
+
+- Use `matchLabels` for stable grouping (`mcp-server: main`).
+- Use `matchExpressions` for dynamic policies across teams.
+
+## Reconciliation loop
+
+The operator continuously ensures actual cluster state matches desired state.
+
+- Watches CRD resources.
+- Materializes deployment/service/ingress/config artifacts.
+- Updates status fields and conditions.
+
+## Runtime composition
+
+Multiple tools, prompts, and resources can be composed behind one `MCPServer` endpoint surface. See [Multi Tool Guide](/guides/multi-tool/).

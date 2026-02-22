@@ -14,6 +14,11 @@
 
 # production
 /build
+/dist
+/.astro
+
+# auto-generated reference docs (built from CRDs during CI)
+/src/content/docs/reference/
 
 # misc
 .DS_Store

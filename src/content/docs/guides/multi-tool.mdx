@@ -1,0 +1,40 @@
+---
+title: Multi Tool
+description: Expose multiple endpoints from one MCPTool using spec.tools[].
+---
+
+`MCPTool.spec.tools[]` lets you define multiple logical tool routes in one resource.
+
+## Example
+
+```yaml
+apiVersion: kubemcp.io/v1alpha1
+kind: MCPTool
+metadata:
+  name: platform-toolkit
+  namespace: mcp-system
+  labels:
+    mcp-server: main
+spec:
+  name: platform-toolkit
+  description: Common platform operations
+  tools:
+    - name: service-status
+      description: Check status of a service
+      method: GET
+      ingressPath: /tools/platform/service-status
+      service:
+        name: platform-api
+        port: 8080
+        path: /service-status
+    - name: restart-workload
+      description: Restart a workload
+      method: POST
+      ingressPath: /tools/platform/restart
+      service:
+        name: platform-api
+        port: 8080
+        path: /restart
+```
+
+Use this pattern for shared auth, transport, and backend ownership.
