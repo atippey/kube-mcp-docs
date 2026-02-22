@@ -78,7 +78,9 @@ function formatType(node: SchemaNode): string {
   }
 
   const baseType = node.type ?? 'unknown';
-  const enumSuffix = node.enum?.length ? ` (${node.enum.map((v) => JSON.stringify(v)).join(', ')})` : '';
+  const enumSuffix = node.enum?.length
+    ? ` (${node.enum.map((v) => JSON.stringify(v)).join(', ')})`
+    : '';
   const formatSuffix = node.format ? ` [${node.format}]` : '';
   return `${baseType}${formatSuffix}${enumSuffix}`;
 }

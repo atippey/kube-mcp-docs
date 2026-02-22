@@ -1,5 +1,5 @@
-import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   site: 'https://kubemcp.io',
@@ -14,9 +14,7 @@ export default defineConfig({
         alt: 'kubemcp.io',
       },
       favicon: '/favicon.png',
-      social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/atippey/kube-mcp' },
-      ],
+      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/atippey/kube-mcp' }],
       expressiveCode: {
         themes: ['github-dark', 'github-light'],
       },
@@ -70,7 +68,10 @@ export default defineConfig({
             content: 'Kubernetes-native MCP server operator',
           },
         },
-        { tag: 'meta', attrs: { property: 'og:image', content: 'https://kubemcp.io/og-image.png' } },
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image', content: 'https://kubemcp.io/og-image.png' },
+        },
         { tag: 'meta', attrs: { property: 'og:type', content: 'website' } },
       ],
     }),
