@@ -10,6 +10,9 @@
     "build": "npm run generate:schemas && astro build",
     "preview": "astro preview",
     "generate:schemas": "tsx scripts/generate-schema-docs.ts",
+    "check:schemas": "npm run generate:schemas && git diff --exit-code -- src/content/docs/reference",
+    "validate:tag": "node scripts/validate-tag.mjs",
+    "hooks:install": "git config core.hooksPath .githooks",
     "lint": "biome ci .",
     "format": "biome format --write ."
   },

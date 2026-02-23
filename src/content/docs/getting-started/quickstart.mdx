@@ -1,70 +1,155 @@
 ---
 title: Quickstart
-description: Deploy your first MCPServer and MCPTool in minutes.
+description: Deploy a working MCP server with tools, prompts, and resources in minutes.
 ---
 
-## 1. Deploy an MCPServer
+import { Aside } from '@astrojs/starlight/components';
+
+<Aside>
+  This guide assumes you have already completed [Installation](/getting-started/installation/) and
+  have the operator running with CRDs installed.
+</Aside>
+
+## Deploy the echo-server example
+
+The echo-server is the "hello world" of kube-mcp. It demonstrates all four CRD types together.
+
+```bash
+kubectl apply -k "github.com/atippey/kube-mcp//examples/echo-server/manifests?ref=fdd289260a135ac2944be6814b0d80ff2e6a899e"
+```
+
+This creates:
+
+| Resource | Name | What it does |
+|---|---|---|
+| **Namespace** | `mcp-test` | Isolated namespace for the example |
+| **Deployment + Service** | `echo-backend` | Simple HTTP echo backend |
+| **MCPServer** | `echo` | Aggregates tools/prompts/resources via label selector |
+| **MCPTool** | `echo-tool` | Echoes back input — points to the echo-backend Service |
+| **MCPTool** | `calculator-tool` | Basic math operations |
+| **MCPPrompt** | `greeting-prompt` | Template with `{{name}}`, `{{date}}`, `{{topic}}` variables |
+| **MCPPrompt** | `code-review-prompt` | Code review template |
+| **MCPResource** | `sample-config` | Inline JSON configuration |
+| **MCPResource** | `readme` | Inline Markdown documentation |
+
+## Verify
+
+Check the operator reconciled everything:
+
+```bash
+# CRDs
+kubectl get mcpservers -n mcp-test
+kubectl get mcptools -n mcp-test
+kubectl get mcpprompts -n mcp-test
+kubectl get mcpresources -n mcp-test
+
+# Operator-generated resources
+kubectl get deployment,service,configmap -n mcp-test -l app.kubernetes.io/instance=echo
+
+# Pods should be Running
+kubectl get pods -n mcp-test
+```
+
+The operator creates a Deployment, Service, and ConfigMap for the `echo` MCPServer. The ConfigMap contains the aggregated tool/prompt/resource configuration, mounted into the MCP server pod.
+
+Check the MCPServer status conditions to confirm the operator discovered everything:
+
+```bash
+kubectl describe mcpserver echo -n mcp-test
+```
+
+Look for the `Conditions` section in the output:
+
+```
+Status:
+  Conditions:
+    Type:    ToolsDiscovered
+    Status:  True
+    Reason:  ResourcesFound
+    Message: Found 2 tool(s), 2 prompt(s), 2 resource(s) matching selector ...
+    Type:    ConfigReady
+    Status:  True
+    Reason:  ConfigMapCreated
+    Message: ConfigMap created with 2 tool(s), 2 prompt(s), 2 resource(s)
+    Type:    Ready
+    Status:  True
+    Reason:  DeploymentReady
+    Message: Deployment has 1 ready replica(s)
+```
+
+If `ToolsDiscovered` is `False`, check that your MCPTool labels match the MCPServer's `toolSelector`.
+
+## Direct Pattern: third-party MCP servers
+
+Some MCP servers are self-contained — no separate backend needed. Use `image`, `args`, and `env` on the MCPServer to run them directly:
 
 ```yaml
 apiVersion: kubemcp.io/v1alpha1
 kind: MCPServer
 metadata:
-  name: main
+  name: aws-diagram
   namespace: mcp-system
 spec:
   replicas: 1
+  image: mcp/aws-diagram:latest
+  args:
+    - "--transport"
+    - "sse"
+    - "--port"
+    - "8080"
+    - "--host"
+    - "0.0.0.0"
+  env:
+    - name: FASTMCP_LOG_LEVEL
+      value: "ERROR"
   redis:
     serviceName: mcp-redis
+  ingress:
+    host: aws-diagram.kubemcp.io
+    pathPrefix: /sse
   toolSelector:
     matchLabels:
-      mcp-server: main
+      mcp-server: aws-diagram
 ```
 
-Apply it:
-
-```bash
-kubectl apply -f mcpserver.yaml
-```
-
-## 2. Deploy one MCPTool
+The `env` field also supports `valueFrom` for Secrets and ConfigMaps:
 
 ```yaml
-apiVersion: kubemcp.io/v1alpha1
-kind: MCPTool
-metadata:
-  name: weather
-  namespace: mcp-system
-  labels:
-    mcp-server: main
-spec:
-  name: weather
-  description: Return weather for a location
-  service:
-    name: weather-tool-svc
-    port: 8080
-    path: /weather
-  method: POST
-  ingressPath: /tools/weather
-  inputSchema:
-    type: object
-    required: [city]
-    properties:
-      city:
-        type: string
+env:
+  - name: API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: my-secret
+        key: api-key
 ```
 
-Apply it:
+## More examples
+
+| Example | Description |
+|---|---|
+| [echo-server](https://github.com/atippey/kube-mcp/tree/main/examples/echo-server) | Simple echo backend — the "hello world" of kube-mcp |
+| [hash-tool](https://github.com/atippey/kube-mcp/tree/main/examples/hash-tool) | Cryptographic hash generation (md5, sha1, sha256, sha512) |
+| [time-tool](https://github.com/atippey/kube-mcp/tree/main/examples/time-tool) | Timezone-aware time formatting |
+| [weather-tool](https://github.com/atippey/kube-mcp/tree/main/examples/weather-tool) | Weather information via external API |
+| [dns-tool](https://github.com/atippey/kube-mcp/tree/main/examples/dns-tool) | DNS lookup tool |
+| [kubectl-explain](https://github.com/atippey/kube-mcp/tree/main/examples/kubectl-explain) | Kubernetes resource explanation |
+| [kube-info-tool](https://github.com/atippey/kube-mcp/tree/main/examples/kube-info-tool) | Kubernetes cluster information |
+| [act-tool](https://github.com/atippey/kube-mcp/tree/main/examples/act-tool) | GitHub Actions local runner (nektos/act) |
+| [crane-tool](https://github.com/atippey/kube-mcp/tree/main/examples/crane-tool) | Container image registry tool |
+| [compliance-tool](https://github.com/atippey/kube-mcp/tree/main/examples/compliance-tool) | FIPS, STIG, FedRAMP compliance checking |
+| [aws-diagram-tool](https://github.com/atippey/kube-mcp/tree/main/examples/aws-diagram-tool) | AWS architecture diagram generator (Direct Pattern) |
+
+## Cleanup
 
 ```bash
-kubectl apply -f mcptool.yaml
+kubectl delete -k "github.com/atippey/kube-mcp//examples/echo-server/manifests?ref=fdd289260a135ac2944be6814b0d80ff2e6a899e"
 ```
 
-## 3. Validate
+## Next steps
 
-```bash
-kubectl get mcpserver -n mcp-system
-kubectl get mcptool -n mcp-system
-kubectl describe mcpserver main -n mcp-system
-```
-
-See full fields in [MCPServer reference](/reference/mcpserver/) and [MCPTool reference](/reference/mcptool/).
+- [MCPServer reference](/reference/mcpserver/)
+- [MCPTool reference](/reference/mcptool/)
+- [MCPPrompt reference](/reference/mcpprompt/)
+- [MCPResource reference](/reference/mcpresource/)
+- [Creating tools guide](/guides/creating-tools/)
+- [Multi-tool servers](/guides/multi-tool/)

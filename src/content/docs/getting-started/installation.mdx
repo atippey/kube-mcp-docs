@@ -12,10 +12,10 @@ description: Install CRDs and deploy the operator with Kustomize.
 ## Install CRDs
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcpserver-crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcptool-crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcpprompt-crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/42da9dcb4adc0871233f143556b62237da9fdc2a/crd/mcpresource-crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcpserver-crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcptool-crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcpprompt-crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcpresource-crd.yaml
 ```
 
 These URLs are pinned to a specific upstream commit for reproducible installs.
