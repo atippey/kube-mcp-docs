@@ -69,8 +69,8 @@ npm run preview
 
 `scripts/generate-schema-docs.ts` reads:
 
-- `ext/kube-mcp/crd/*-crd.yaml`
-- `ext/kube-mcp/crd/examples.yaml`
+- `ext/kube-mcp/manifests/base/crds/*-crd.yaml`
+- `ext/kube-mcp/examples/echo-server/manifests/example-resources.yaml`
 
 It writes:
 
@@ -88,7 +88,7 @@ operator version you are documenting.
 
 Current pinned commit:
 
-- `42da9dcb4adc0871233f143556b62237da9fdc2a`
+- `fdd289260a135ac2944be6814b0d80ff2e6a899e`
 
 When updating the submodule, also verify docs and install snippets that reference pinned upstream
 content.

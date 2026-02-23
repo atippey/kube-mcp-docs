@@ -34,8 +34,14 @@ type CrdDoc = {
 
 const ROOT = process.cwd();
 const UPSTREAM_DIR = path.join(ROOT, 'ext', 'kube-mcp');
-const CRD_DIR = path.join(UPSTREAM_DIR, 'crd');
-const EXAMPLES_FILE = path.join(CRD_DIR, 'examples.yaml');
+const CRD_DIR = path.join(UPSTREAM_DIR, 'manifests', 'base', 'crds');
+const EXAMPLES_FILE = path.join(
+  UPSTREAM_DIR,
+  'examples',
+  'echo-server',
+  'manifests',
+  'example-resources.yaml',
+);
 const OUT_DIR = path.join(ROOT, 'src', 'content', 'docs', 'reference');
 
 function ensureString(value: unknown, fallback = ''): string {
@@ -149,23 +155,26 @@ function buildSection(nodePath: string, node: SchemaNode): string {
 
 async function loadExamplesByKind(): Promise<Map<string, string>> {
   const out = new Map<string, string>();
-  const text = await fs.readFile(EXAMPLES_FILE, 'utf8');
-  const codeBlockRegex = /```yaml\n([\s\S]*?)```/g;
+  let text: string;
+  try {
+    text = await fs.readFile(EXAMPLES_FILE, 'utf8');
+  } catch {
+    // Examples file is optional; missing file just means no examples in reference docs.
+    return out;
+  }
 
-  for (const match of text.matchAll(codeBlockRegex)) {
-    const yamlSnippet = match[1].trim();
+  const docs = YAML.parseAllDocuments(text);
+  for (const doc of docs) {
     try {
-      const docs = YAML.parseAllDocuments(yamlSnippet);
-      for (const doc of docs) {
-        const parsed = doc.toJSON() as Json;
-        const kind = ensureString(parsed.kind);
-        if (!kind) continue;
-        if (!out.has(kind.toLowerCase())) {
-          out.set(kind.toLowerCase(), yamlSnippet);
-        }
+      const parsed = doc.toJSON() as Json;
+      if (!parsed || typeof parsed !== 'object') continue;
+      const kind = ensureString(parsed.kind);
+      if (!kind) continue;
+      if (!out.has(kind.toLowerCase())) {
+        out.set(kind.toLowerCase(), doc.toString().trim());
       }
     } catch {
-      // Keep going; malformed example snippets should not fail docs generation.
+      // Keep going; malformed documents should not fail docs generation.
     }
   }
 
