@@ -6,6 +6,7 @@
       "!dist",
       "!.astro",
       "!.claude",
+      "!ext",
       "!src/content/docs/reference",
       "!package-lock.json"
     ]
