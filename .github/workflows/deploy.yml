@@ -6,6 +6,11 @@ on:
     tags: ['v*']
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g. v0.0.1d1)'
+        required: true
 
 jobs:
   build:
@@ -16,6 +21,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: recursive
+          ref: ${{ github.event.inputs.tag || github.ref }}
 
       - uses: actions/setup-node@v6
         with:
@@ -29,14 +35,15 @@ jobs:
       - run: npm run build
 
       - uses: actions/upload-artifact@v6
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
           name: site
           path: dist/
+          retention-days: 90
 
   deploy:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: cloudflare
     permissions:
@@ -52,4 +59,9 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.PUBLISH_ACCOUNT_ID }}
-          command: pages deploy dist/ --project-name=kubemcp-docs --branch=main
+          command: >-
+            pages deploy dist/
+            --project-name=kubemcp-docs
+            --branch=main
+            --commit-hash=${{ github.sha }}
+            --commit-message="${{ github.event.inputs.tag || github.ref_name }}"
