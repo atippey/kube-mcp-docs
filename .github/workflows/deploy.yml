@@ -23,6 +23,7 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm run generate:schemas
       - run: npm run lint
       - run: npx astro sync
       - run: npx tsc --noEmit
