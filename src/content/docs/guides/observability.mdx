@@ -1,7 +1,75 @@
 ---
 title: Observability
-description: Monitor MCP workloads with metrics, logs, and health checks.
+description: Monitor MCP workloads with metrics, logs, health checks, and status conditions.
 ---
+
+## Status conditions
+
+Each MCPServer exposes a `status.conditions` array that reflects the outcome of the last reconciliation. Use conditions as the first step when diagnosing issues.
+
+```bash
+kubectl describe mcpserver <name> -n <namespace>
+```
+
+### MCPServer conditions
+
+| Condition | Status `True` means… | Status `False` means… | What to check |
+|---|---|---|---|
+| `ToolsDiscovered` | At least one MCPTool, MCPPrompt, or MCPResource matched `toolSelector` | No resources matched | Verify labels on MCPTool/Prompt/Resource match the MCPServer's `toolSelector` |
+| `ConfigReady` | ConfigMap written successfully with all tool/prompt/resource config | _(not set — reconciliation raises before writing False; check for a missing condition)_ | Check operator logs if this condition is absent or stale |
+| `Ready` | Deployment has at least one ready replica | No replicas ready | Check pod events and image pull errors |
+
+Example output showing a healthy server:
+
+```
+Status:
+  Ready Replicas:  1
+  Tool Count:      2
+  Prompt Count:    2
+  Resource Count:  2
+  Conditions:
+    Type:    ToolsDiscovered
+    Status:  True
+    Reason:  ResourcesFound
+    Message: Found 2 tool(s), 2 prompt(s), 2 resource(s) matching selector ...
+    Type:    ConfigReady
+    Status:  True
+    Reason:  ConfigMapCreated
+    Message: ConfigMap created with 2 tool(s), 2 prompt(s), 2 resource(s)
+    Type:    Ready
+    Status:  True
+    Reason:  DeploymentReady
+    Message: Deployment has 1 ready replica(s)
+```
+
+### Child resource conditions
+
+MCPTool, MCPPrompt, and MCPResource each carry their own `status.conditions`. When any child resource changes, the operator re-reconciles **all MCPServers in the same namespace** (not just those whose `toolSelector` matches).
+
+#### MCPTool — condition type `Ready`
+
+| Reason | Status | Meaning |
+|---|---|---|
+| `ServiceResolved` | True | Service found; `status.resolvedEndpoint` contains the full URL |
+| `ServiceNotFound` | False | Named Service does not exist in the namespace |
+
+#### MCPPrompt — condition type `Validated`
+
+| Reason | Status | Meaning |
+|---|---|---|
+| `TemplateValid` | True | All `{{variable}}` placeholders are declared in `spec.variables` |
+| `UndeclaredVariables` | False | Template uses variables not listed in `spec.variables` |
+| `UnusedVariables` | False | `spec.variables` declares names not referenced in the template |
+
+#### MCPResource — condition type `Ready`
+
+| Reason | Status | Meaning |
+|---|---|---|
+| `ContentValid` | True | Inline `spec.content` validated successfully |
+| `OperationsValid` | True | All `spec.operations` validated and service endpoints resolved |
+| `InvalidSpec` | False | Neither `spec.operations` nor `spec.content` is defined |
+| `EmptyContent` | False | `spec.content` has neither `text` nor `blob` |
+| `ServiceNotFound` | False | A Service referenced in `spec.operations` does not exist |
 
 ## Metrics
 
@@ -23,8 +91,6 @@ kubectl logs -n mcp-system deploy/mcp-operator -f
 ## Health endpoints
 
 Ensure readiness and liveness probes are enabled in your deployment specs.
-
-Use resource status and conditions for quick diagnostics:
 
 ```bash
 kubectl describe mcpserver main -n mcp-system

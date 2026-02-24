@@ -51,4 +51,4 @@ jobs:
         with:
           apiToken: ${{ secrets.PUBLISH_THE_DOCS }}
           accountId: ${{ secrets.PUBLISH_ACCOUNT_ID }}
-          command: pages deploy dist/ --project-name=kubemcp-docs
+          command: pages deploy dist/ --project-name=kubemcp-docs --branch=main
