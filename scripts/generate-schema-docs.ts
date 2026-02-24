@@ -181,6 +181,81 @@ async function loadExamplesByKind(): Promise<Map<string, string>> {
   return out;
 }
 
+// Static content appended to specific CRD pages after the auto-generated schema.
+const CONDITION_DOCS: Record<string, string> = {
+  MCPServer: `
+# Condition reference
+
+The operator sets three conditions on every MCPServer during reconciliation.
+
+| Condition | Reason (True) | Reason (False) | Description |
+| --- | --- | --- | --- |
+| \`ToolsDiscovered\` | \`ResourcesFound\` | \`NoResourcesFound\` | At least one MCPTool, MCPPrompt, or MCPResource matched \`spec.toolSelector\` |
+| \`ConfigReady\` | \`ConfigMapCreated\` | — | The generated ConfigMap containing tool/prompt/resource config was written successfully |
+| \`Ready\` | \`DeploymentReady\` | \`DeploymentNotReady\` | The MCPServer Deployment has at least one ready replica |
+
+See the [Observability guide](/guides/observability/) for diagnostic patterns using these conditions.
+
+# Generated resources
+
+For each MCPServer the operator creates the following resources (all named \`mcp-server-{name}-*\` and owned by the MCPServer for automatic cleanup):
+
+| Resource | Name | Notes |
+| --- | --- | --- |
+| Deployment | \`mcp-server-{name}\` | Runs \`spec.image\` on port 8080 |
+| Service | \`mcp-server-{name}\` | ClusterIP on port 8080, named \`http\` |
+| ConfigMap | \`mcp-server-{name}-config\` | Mounted read-only at \`/etc/mcp/config\` with \`tools.json\`, \`prompts.json\`, \`resources.json\` |
+| NetworkPolicy | \`mcp-server-{name}-egress\` | Auto-generated egress to Redis, DNS, and discovered tool/resource services |
+| Ingress | \`mcp-server-{name}\` | Only when \`spec.ingress\` is configured |
+
+The operator always injects two environment variables into the container before any user-provided \`spec.env\` entries:
+
+| Variable | Value |
+| --- | --- |
+| \`REDIS_HOST\` | \`spec.redis.serviceName\` |
+| \`MCP_CONFIG_DIR\` | \`/etc/mcp/config\` |
+
+> **Note:** \`spec.config.requestTimeout\` and \`spec.config.maxConcurrentRequests\` are accepted by the CRD schema but are not yet consumed by the operator. They are reserved for a future release.
+`,
+
+  MCPTool: `
+# Condition reference
+
+| Condition | Reason | Status | Description |
+| --- | --- | --- | --- |
+| \`Ready\` | \`ServiceResolved\` | True | Named Service found; \`status.resolvedEndpoint\` contains the full URL |
+| \`Ready\` | \`ServiceNotFound\` | False | Named Service does not exist in the namespace |
+
+See the [Observability guide](/guides/observability/) for diagnostic patterns using these conditions.
+`,
+
+  MCPPrompt: `
+# Condition reference
+
+| Condition | Reason | Status | Description |
+| --- | --- | --- | --- |
+| \`Validated\` | \`TemplateValid\` | True | All \`&#123;&#123;variable&#125;&#125;\` placeholders are declared in \`spec.variables\` |
+| \`Validated\` | \`UndeclaredVariables\` | False | Template references variables not listed in \`spec.variables\` |
+| \`Validated\` | \`UnusedVariables\` | False | \`spec.variables\` declares names not referenced in the template |
+
+See the [Observability guide](/guides/observability/) for diagnostic patterns using these conditions.
+`,
+
+  MCPResource: `
+# Condition reference
+
+| Condition | Reason | Status | Description |
+| --- | --- | --- | --- |
+| \`Ready\` | \`ContentValid\` | True | Inline \`spec.content\` validated successfully |
+| \`Ready\` | \`OperationsValid\` | True | All \`spec.operations\` validated and service endpoints resolved |
+| \`Ready\` | \`InvalidSpec\` | False | Neither \`spec.operations\` nor \`spec.content\` is defined |
+| \`Ready\` | \`EmptyContent\` | False | \`spec.content\` has neither \`text\` nor \`blob\` |
+| \`Ready\` | \`ServiceNotFound\` | False | A Service referenced in \`spec.operations\` does not exist in the namespace |
+
+See the [Observability guide](/guides/observability/) for diagnostic patterns using these conditions.
+`,
+};
+
 function mdxForCrd(args: {
   kind: string;
   group: string;
@@ -213,6 +288,10 @@ function mdxForCrd(args: {
 
   if (example) {
     sections.push('', '# Example', '', '```yaml', example, '```');
+  }
+
+  if (CONDITION_DOCS[kind]) {
+    sections.push(CONDITION_DOCS[kind]);
   }
 
   return sections.join('\n');

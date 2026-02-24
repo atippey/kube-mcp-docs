@@ -3,6 +3,62 @@ title: Networking
 description: Secure traffic with NetworkPolicy and namespace boundaries.
 ---
 
+## Auto-generated NetworkPolicy
+
+The operator generates a NetworkPolicy named `mcp-server-{name}-egress` for each MCPServer. It always includes egress rules for:
+
+- **Redis** — port 6379 TCP to pods labeled `app.kubernetes.io/name: mcp-redis` / `app.kubernetes.io/component: cache`
+- **DNS** — port 53 UDP and TCP to pods labeled `k8s-app: kube-dns`
+- **Tool and resource services** — derived from the `spec.service` references on every MCPTool and MCPResource selected by the MCPServer
+
+The service egress rules are controlled by annotations on each **MCPTool** or **MCPResource** CR.
+
+### Egress mode annotations
+
+| Annotation | Values | Default |
+|---|---|---|
+| `kubemcp.io/egress-mode` | `selector` \| `namespace` \| `cidr` | `selector` |
+| `kubemcp.io/egress-ports` | Comma-separated port numbers, e.g. `8080,8443` | Service port |
+| `kubemcp.io/egress-cidrs` | Comma-separated CIDR blocks, e.g. `10.0.0.0/8` | _(required when mode is `cidr`)_ |
+
+#### `selector` (default)
+
+Allows egress to pods matched by the Service's own selector, scoped to the service's namespace. This is the most restrictive mode and works for standard ClusterIP services.
+
+```yaml
+apiVersion: kubemcp.io/v1alpha1
+kind: MCPTool
+metadata:
+  name: my-tool
+  annotations: {}  # selector mode is the default; no annotation needed
+spec:
+  service:
+    name: my-backend-svc
+    port: 8080
+```
+
+#### `namespace`
+
+Allows egress to all pods in the service's namespace. Use this when the Service has no pod selector (e.g. headless or selector-less services).
+
+```yaml
+metadata:
+  annotations:
+    kubemcp.io/egress-mode: namespace
+```
+
+#### `cidr`
+
+Allows egress to specific CIDR ranges. Required for `ExternalName` services and external endpoints.
+
+```yaml
+metadata:
+  annotations:
+    kubemcp.io/egress-mode: cidr
+    kubemcp.io/egress-cidrs: "203.0.113.0/24,198.51.100.0/24"
+    kubemcp.io/egress-ports: "443"
+```
+
 ## NetworkPolicy baseline
 
 Restrict ingress to operator and tool workloads to only required namespaces and ports.
@@ -31,4 +87,5 @@ spec:
 ## Cross-namespace access
 
 - Keep `MCPServer` and related resources in the same namespace by default.
-- If you require cross-namespace service targets, enforce policy with explicit selectors and RBAC scoping.
+- If you require cross-namespace service targets, set `spec.service.namespace` on the MCPTool/MCPResource and use `kubemcp.io/egress-mode: namespace` or `cidr` annotations to match the generated NetworkPolicy to the correct peers.
+- Enforce cross-namespace access with explicit RBAC scoping.
