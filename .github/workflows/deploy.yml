@@ -23,7 +23,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run generate:schemas
       - run: npm run lint
       - run: npx astro sync
       - run: npx tsc --noEmit
@@ -52,4 +51,4 @@ jobs:
         with:
           apiToken: ${{ secrets.PUBLISH_THE_DOCS }}
           accountId: ${{ secrets.PUBLISH_ACCOUNT_ID }}
-          command: pages deploy dist/ --project-name=kubemcp-docs
+          command: pages deploy dist/ --project-name=kubemcp-docs --branch=main
