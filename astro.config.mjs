@@ -10,7 +10,7 @@ export default defineConfig({
       description: 'Kubernetes-native MCP server operator',
       defaultLocale: 'root',
       logo: {
-        src: './src/assets/logo.png',
+        src: './src/assets/icon.png',
         alt: 'kubemcp.io',
       },
       favicon: '/favicon.png',
