@@ -1,0 +1,31 @@
+# kubemcp.io
+
+> Kubernetes-native operator for running Model Context Protocol (MCP) servers as first-class cluster resources. Define MCP tools, prompts, and resources with CRDs; the operator manages Deployments, Services, ConfigMaps, NetworkPolicies, and Ingress automatically.
+
+kubemcp.io ships four CRDs: `MCPServer` (the server deployment), `MCPTool` (a callable tool backed by an HTTP service), `MCPPrompt` (a reusable prompt template), and `MCPResource` (a readable data resource). Tools, prompts, and resources are selected into a server by label using `spec.toolSelector`.
+
+## Getting Started
+
+- [Installation](https://kubemcp.io/getting-started/installation/): Install CRDs and deploy the operator with Kustomize.
+- [Quickstart](https://kubemcp.io/getting-started/quickstart/): Deploy a working MCP server with tools, prompts, and resources in minutes.
+- [Concepts](https://kubemcp.io/getting-started/concepts/): Core architecture and reconciliation model.
+
+## Guides
+
+- [Creating Tools](https://kubemcp.io/guides/creating-tools/): Build a backing service and register it with MCPTool.
+- [Multi Tool](https://kubemcp.io/guides/multi-tool/): Expose multiple endpoints from one MCPTool using spec.tools[].
+- [Prompts and Resources](https://kubemcp.io/guides/prompts-resources/): Add reusable prompt templates and API resources.
+- [Networking](https://kubemcp.io/guides/networking/): Secure traffic with NetworkPolicy and namespace boundaries.
+- [Observability](https://kubemcp.io/guides/observability/): Monitor MCP workloads with metrics, logs, health checks, and status conditions.
+
+## Reference
+
+- [MCPServer](https://kubemcp.io/reference/mcpserver/): CRD schema, status conditions, and generated child resources.
+- [MCPTool](https://kubemcp.io/reference/mcptool/): CRD schema for registering callable tool endpoints.
+- [MCPPrompt](https://kubemcp.io/reference/mcpprompt/): CRD schema for reusable prompt templates.
+- [MCPResource](https://kubemcp.io/reference/mcpresource/): CRD schema for readable data resources.
+
+## Project
+
+- [Roadmap](https://kubemcp.io/project/roadmap/): High-level direction and upcoming milestones.
+- [Contributing](https://kubemcp.io/project/contributing/): Development setup, testing, and pull requests.
