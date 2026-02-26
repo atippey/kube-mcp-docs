@@ -44,3 +44,4 @@ Allow: /
 Sitemap: https://kubemcp.io/sitemap.xml
 Sitemap: https://kubemcp.io/sitemap-index.xml
 LLMs: https://kubemcp.io/llms.txt
+LLMs-Full: https://kubemcp.io/llms-full.txt

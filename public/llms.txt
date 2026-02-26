@@ -29,3 +29,7 @@ kubemcp.io ships four CRDs: `MCPServer` (the server deployment), `MCPTool` (a ca
 
 - [Roadmap](https://kubemcp.io/project/roadmap/): High-level direction and upcoming milestones.
 - [Contributing](https://kubemcp.io/project/contributing/): Development setup, testing, and pull requests.
+
+## More
+
+- [Full Index](https://kubemcp.io/llms-full.txt): Complete page-level index for crawlers and AI systems.

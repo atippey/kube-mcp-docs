@@ -1,0 +1,38 @@
+# kubemcp.io (Full Index)
+
+> Complete page index for kubemcp.io documentation.
+
+## Canonical LLM Indexes
+
+- [LLMs Index](https://kubemcp.io/llms.txt): Curated, compact index.
+- [LLMs Full Index](https://kubemcp.io/llms-full.txt): This full page list.
+
+## Overview
+
+- [Home](https://kubemcp.io/): Project overview and navigation entrypoint.
+
+## Getting Started
+
+- [Installation](https://kubemcp.io/getting-started/installation/): Install CRDs and deploy the operator.
+- [Quickstart](https://kubemcp.io/getting-started/quickstart/): Deploy a working MCP server with tools, prompts, and resources.
+- [Concepts](https://kubemcp.io/getting-started/concepts/): Reconciliation model and architecture.
+
+## Guides
+
+- [Creating Tools](https://kubemcp.io/guides/creating-tools/): Register callable tool endpoints with `MCPTool`.
+- [Multi Tool](https://kubemcp.io/guides/multi-tool/): Define multiple tools via `spec.tools[]`.
+- [Prompts and Resources](https://kubemcp.io/guides/prompts-resources/): Add reusable prompts and readable resources.
+- [Networking](https://kubemcp.io/guides/networking/): Service exposure and policy guidance.
+- [Observability](https://kubemcp.io/guides/observability/): Metrics, logs, health, and status checks.
+
+## Reference
+
+- [MCPServer](https://kubemcp.io/reference/mcpserver/): `MCPServer` CRD reference.
+- [MCPTool](https://kubemcp.io/reference/mcptool/): `MCPTool` CRD reference.
+- [MCPPrompt](https://kubemcp.io/reference/mcpprompt/): `MCPPrompt` CRD reference.
+- [MCPResource](https://kubemcp.io/reference/mcpresource/): `MCPResource` CRD reference.
+
+## Project
+
+- [Roadmap](https://kubemcp.io/project/roadmap/): Planned direction and milestones.
+- [Contributing](https://kubemcp.io/project/contributing/): Development workflow and contribution process.
