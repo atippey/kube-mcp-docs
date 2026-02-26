@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run generate:schemas && astro dev",
-    "build": "npm run generate:schemas && astro build",
+    "build": "npm run generate:schemas && astro build && node scripts/create-sitemap-alias.mjs",
     "preview": "astro preview",
     "generate:schemas": "tsx scripts/generate-schema-docs.ts",
     "check:schemas": "npm run generate:schemas && git diff --exit-code -- src/content/docs/reference",
