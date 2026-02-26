@@ -42,3 +42,4 @@ User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://kubemcp.io/sitemap-index.xml
+LLMs: https://kubemcp.io/llms.txt
