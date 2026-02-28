@@ -46,8 +46,8 @@ For local iteration:
 
 The generator reads:
 
-- `ext/kube-mcp/crd/*-crd.yaml`
-- `ext/kube-mcp/crd/examples.yaml`
+- `ext/kube-mcp/manifests/base/crds/*-crd.yaml`
+- `ext/kube-mcp/examples/echo-server/manifests/example-resources.yaml`
 
 The generator writes:
 
@@ -57,6 +57,20 @@ The generator writes:
 - `src/content/docs/reference/mcpresource.mdx`
 
 If generated output is wrong, fix the generator or upstream schema, then regenerate.
+
+## Helm version injection
+
+`src/components/HelmInstall.astro` renders the install/upgrade/show-values commands on the
+Installation page. It resolves the operator version at build time:
+
+1. Runs `git describe --tags --exact-match` on `ext/kube-mcp`.
+2. If the submodule is not on an exact tag and a release build is detected
+   (`GITHUB_REF` starts with `refs/tags/` or `GITHUB_EVENT_NAME == workflow_dispatch`),
+   the build **fails hard** — do not work around this.
+3. In all other environments (local dev, PR preview) the version falls back to `latest`.
+
+When preparing a docs release, `ext/kube-mcp` **must** be pinned to a tagged upstream commit.
+This is enforced by the build; it is also validated by the `pre-push` hook.
 
 ## Content and navigation
 
@@ -85,8 +99,8 @@ Workflow: `.github/workflows/deploy.yml`
 - Deploy runs only for tag refs matching `v*`.
 - Cloudflare Pages deploy command:
   - `pages deploy dist/ --project-name=kubemcp-docs`
-- Required GitHub secrets:
-  - `PUBLISH_THE_DOCS`
+- Required GitHub secrets (scoped to the `cloudflare` environment):
+  - `CLOUDFLARE_API_TOKEN`
   - `PUBLISH_ACCOUNT_ID`
 
 ## Tag/release policy
@@ -121,3 +135,5 @@ Biome excludes generated/build artifacts and generated reference docs by configu
 - Do not commit changes to `dist/` or `.astro/`.
 - Do not bypass schema generation by manually editing `reference/*.mdx`.
 - Do not switch deployment behavior from tag-gated to branch-gated without explicit approval.
+- Do not pin `ext/kube-mcp` to an untagged commit before a docs release — the build will fail.
+- Do not work around the `HelmInstall` build failure; fix the submodule pin instead.

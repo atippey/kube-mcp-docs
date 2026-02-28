@@ -1,32 +1,25 @@
 ---
 title: Installation
-description: Install CRDs and deploy the operator with Kustomize.
+description: Install the operator with Helm or Kustomize.
 ---
+
+import HelmInstall from '../../../components/HelmInstall.astro';
 
 ## Prerequisites
 
 - Kubernetes cluster (v1.27+ recommended)
 - `kubectl`
+- Helm 3.8+ (for OCI registry support) **or** `kustomize`
 - Access to deploy into your target namespace
 
-## Install CRDs
+## Install with Helm (recommended)
+
+<HelmInstall />
+
+## Install with Kustomize
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcpserver-crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcptool-crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcpprompt-crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/atippey/kube-mcp/fdd289260a135ac2944be6814b0d80ff2e6a899e/manifests/base/crds/mcpresource-crd.yaml
-```
-
-These URLs are pinned to a specific upstream commit for reproducible installs.
-When a formal release tag is available, prefer tag-based URLs.
-
-## Deploy Operator (Kustomize)
-
-```bash
-git clone https://github.com/atippey/kube-mcp.git
-cd kube-mcp
-kubectl apply -k manifests/base
+kubectl apply -k https://github.com/atippey/kube-mcp//manifests/base
 ```
 
 ## Verify

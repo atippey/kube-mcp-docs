@@ -1,0 +1,52 @@
+---
+import { Code } from 'astro:components';
+import { execSync } from 'node:child_process';
+
+let version: string;
+try {
+  // Succeeds only if the submodule HEAD is exactly on a tag.
+  const tag = execSync('git -C ext/kube-mcp describe --tags --exact-match', {
+    stdio: ['pipe', 'pipe', 'pipe'],
+  })
+    .toString()
+    .trim();
+  version = tag.replace(/^v/, '');
+} catch {
+  const isRelease =
+    process.env.GITHUB_REF?.startsWith('refs/tags/') ||
+    process.env.GITHUB_EVENT_NAME === 'workflow_dispatch';
+  if (isRelease) {
+    throw new Error(
+      '[HelmInstall] Release build detected but ext/kube-mcp is not pinned to a tagged commit. ' +
+        'Pin the submodule to a release tag before publishing docs.',
+    );
+  }
+  version = 'latest';
+}
+
+const installCmd = `helm install mcp-operator oci://ghcr.io/atippey/charts/mcp-operator \\
+  --version ${version} \\
+  --namespace mcp-system \\
+  --create-namespace`;
+
+const upgradeCmd = `helm upgrade mcp-operator oci://ghcr.io/atippey/charts/mcp-operator \\
+  --version ${version} \\
+  --namespace mcp-system`;
+
+const showValuesCmd = `helm show values oci://ghcr.io/atippey/charts/mcp-operator --version ${version}`;
+---
+
+<p>
+  Helm 3.8 or later is required for OCI support. CRDs are bundled in the
+  chart's <code>crds/</code> directory and are installed automatically.
+</p>
+
+<Code code={installCmd} lang="bash" />
+
+<p>To upgrade an existing installation:</p>
+
+<Code code={upgradeCmd} lang="bash" />
+
+<p>To inspect the default values before installing:</p>
+
+<Code code={showValuesCmd} lang="bash" />

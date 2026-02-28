@@ -15,13 +15,15 @@ deployed to Cloudflare Pages.
 
 ```text
 .
-├── ext/kube-mcp/                  # Git submodule: upstream operator source
+├── ext/kube-mcp/                   # Git submodule: upstream operator source
 ├── scripts/generate-schema-docs.ts # Generates CRD reference docs
-├── src/content/docs/              # Starlight docs content
-│   └── reference/                 # Auto-generated CRD reference pages
-├── src/assets/                    # Site logo/icon assets used by Astro
-├── public/                        # Static public assets (favicon/OG image)
-└── .github/workflows/deploy.yml   # CI + tag-gated deploy pipeline
+├── src/
+│   ├── components/                 # Astro components (e.g. HelmInstall.astro)
+│   └── content/docs/               # Starlight docs content
+│       └── reference/              # Auto-generated CRD reference pages
+├── src/assets/                     # Site logo/icon assets used by Astro
+├── public/                         # Static public assets (favicon, robots.txt, llms.txt)
+└── .github/workflows/deploy.yml    # CI + tag-gated deploy pipeline
 ```
 
 ## Prerequisites
@@ -81,17 +83,27 @@ It writes:
 
 Do not hand-edit files in `src/content/docs/reference/`; regenerate instead.
 
+## Helm version injection
+
+`src/components/HelmInstall.astro` renders the Helm install/upgrade/show-values commands in the
+Installation page. It resolves the operator version at build time using the following priority:
+
+1. `git describe --tags --exact-match` on `ext/kube-mcp` — succeeds only when the submodule HEAD
+   is exactly on a tag (e.g. `v0.0.4`).
+2. If the submodule is not on a tagged commit and a release build is detected
+   (`GITHUB_REF` starts with `refs/tags/` or `GITHUB_EVENT_NAME == workflow_dispatch`), the build
+   **fails** with an explicit error message.
+3. Otherwise (local dev / PR preview), the version falls back to `latest` as a placeholder.
+
+**Before tagging a docs release, ensure `ext/kube-mcp` is pinned to an exact upstream tag.**
+If it is not, the release build will fail.
+
 ## Upstream submodule policy
 
-The `ext/kube-mcp` submodule should be pinned to a specific upstream commit that corresponds to the
-operator version you are documenting.
+The `ext/kube-mcp` submodule must be pinned to an upstream release tag (not an arbitrary commit)
+when publishing a docs release. The Helm install commands are generated directly from this tag.
 
-Current pinned commit:
-
-- `fdd289260a135ac2944be6814b0d80ff2e6a899e`
-
-When updating the submodule, also verify docs and install snippets that reference pinned upstream
-content.
+When updating the submodule, run `npm run generate:schemas` to regenerate CRD reference docs.
 
 ## CI and deployment
 
@@ -108,14 +120,14 @@ Behavior:
 - `main` + PR runs: `npm ci`, `npm run lint`, `npx tsc --noEmit`, `npm run build`
 - Tag runs additionally upload build artifact and deploy to Cloudflare Pages
 
-Deploy secrets used by workflow:
+Deploy secrets used by workflow (scoped to the `cloudflare` GitHub environment):
 
-- `PUBLISH_THE_DOCS` (Cloudflare API token)
+- `CLOUDFLARE_API_TOKEN` (Cloudflare API token with Account > Cloudflare Pages: Edit permission)
 - `PUBLISH_ACCOUNT_ID` (Cloudflare account ID)
 
 Deploy command:
 
-- `pages deploy dist/ --project-name=kubemcp-docs`
+- `pages deploy dist/ --project-name=kubemcp-docs --branch=main --commit-hash=<sha> --commit-message=<tag>`
 
 ## Release/tag policy
 
