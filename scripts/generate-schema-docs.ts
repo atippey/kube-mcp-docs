@@ -54,6 +54,7 @@ function normalizeDescription(text: string): string {
 
 function escapeCell(text: string): string {
   return text
+    .replace(/\\/g, '\\\\')
     .replace(/\|/g, '\\|')
     .replace(/\{/g, '&#123;')
     .replace(/\}/g, '&#125;')
