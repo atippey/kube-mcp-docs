@@ -18,8 +18,8 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.0",
-    "@astrojs/starlight": "^0.37.6",
-    "astro": "^5.18.1",
+    "@astrojs/starlight": "^0.38.3",
+    "astro": "^6.1.8",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "yaml": "^2.8.3"
